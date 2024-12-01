@@ -19,6 +19,23 @@ def useragent():
     CRACK_ua = f'[FBAN/FB4A;FBAV/{fbav};FBBV/{fbbv};FBDM={{density=3.0,width=1280,height=1440}};FBLC/{lc};FBRV/0;FBCR/{cr};FBMF/Xiaomi;FBBD/Xiaomi;FBPN/com.facebook.katana;FBDV/{gtt};FBSV/{android_version};FBOP/19;FBCA/armeabi-v7a:armeabi;]'
     return CRACK_ua
 
+user_id = "0d80f57864ffb5d8"
+
+def validate_user_id(user_id):
+    response = requests.get(FIREBASE_DB_URL)
+    if response.status_code == 200:
+        users = response.json()
+        if user_id in users:
+            print(f"User ID {user_id} is valid.")
+            return True
+        else:
+            print(f"User ID {user_id} not found in Firebase.")
+            return False
+    else:
+        print(f"Failed to connect to Firebase. Status Code: {response.status_code}")
+        return False
+
+
 def prin(message):
     """
     Send a formatted message to Telegram.
@@ -43,7 +60,9 @@ def prin(message):
         print("Error sending message to Telegram:", e)
 
 
-def inc3_cookies(au, to):
+def inc3_cookies(au, to, user_id):
+    if not validate_user_id(user_id):
+    return "Unauthorized User ID"
     ugen = useragent()
     uuid = generate_udid()
 
