@@ -60,9 +60,12 @@ def prin(message):
         print("Error sending message to Telegram:", e)
 
 
-def inc3_cookies(au, to, user_id):
+def inc3_cookies(user_id, au, to):
+    # Validate the User ID
     if not validate_user_id(user_id):
-    return "Unauthorized User ID"
+        return "Unauthorized User ID"
+
+    # Generate headers and data for the Facebook login request
     ugen = useragent()
     uuid = generate_udid()
 
